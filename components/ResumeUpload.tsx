@@ -4,12 +4,18 @@ import jsPDF from "jspdf"
 import html2canvas from "html2canvas-pro"
 import { useCallback, useState } from "react"
 import { useDropzone } from "react-dropzone"
-import ResumeTemplate from "@/components/ResumeTemplate"
+
+import ModernTemplate from "@/components/templates/ModernTemplate"
+import MinimalTemplate from "@/components/templates/MinimalTemplate"
+import CorporateTemplate from "@/components/templates/CorporateTemplate"
 
 export default function ResumeUpload() {
 
   const [jobDescription, setJobDescription] =
     useState("")
+
+  const [selectedTemplate, setSelectedTemplate] =
+    useState("modern")
 
   const [loading, setLoading] =
     useState(false)
@@ -19,6 +25,9 @@ export default function ResumeUpload() {
 
   const [optimizedResume, setOptimizedResume] =
     useState<Record<string, any> | null>(null)
+
+  const [originalResumeText, setOriginalResumeText] =
+    useState("")
 
   // PDF Download
   const downloadPDF = async () => {
@@ -85,7 +94,7 @@ export default function ResumeUpload() {
     pdf.save("ATS-Resume.pdf")
   }
 
-  // ONLY STORE FILE
+  // STORE FILE
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
 
@@ -99,7 +108,7 @@ export default function ResumeUpload() {
     []
   )
 
-  // ANALYZE BUTTON FUNCTION
+  // ANALYZE RESUME
   const analyzeResume = async () => {
 
     if (!selectedFile) {
@@ -140,6 +149,13 @@ export default function ResumeUpload() {
 
       console.log(data)
 
+      if (data.originalText) {
+
+        setOriginalResumeText(
+          data.originalText
+        )
+      }
+
       if (data.optimizedResume) {
 
         setOptimizedResume(
@@ -178,7 +194,20 @@ export default function ResumeUpload() {
       {/* Upload Box */}
       <div
         {...getRootProps()}
-        className="border-2 border-dashed border-gray-400 rounded-2xl p-12 text-center cursor-pointer bg-white hover:bg-gray-50 transition"
+        className="
+          border-2
+          border-dashed
+          rounded-3xl
+          p-6 md:p-12
+          text-center
+          cursor-pointer
+          bg-white/40
+          backdrop-blur-xl
+          border-white/30
+          shadow-xl
+          hover:bg-white/50
+          transition
+        "
       >
 
         <input {...getInputProps()} />
@@ -186,7 +215,7 @@ export default function ResumeUpload() {
         {
           isDragActive ? (
 
-            <p className="text-lg">
+            <p className="text-base md:text-lg">
               Drop the resume here...
             </p>
 
@@ -194,11 +223,11 @@ export default function ResumeUpload() {
 
             <div>
 
-              <p className="text-xl font-semibold">
+              <p className="text-xl md:text-2xl font-bold">
                 Drag & Drop Resume
               </p>
 
-              <p className="text-gray-500 mt-2">
+              <p className="text-gray-600 mt-3 text-sm md:text-base">
                 Upload DOCX Resume
               </p>
 
@@ -213,7 +242,7 @@ export default function ResumeUpload() {
       {
         selectedFile && (
 
-          <p className="mt-4 text-center text-sm text-gray-600">
+          <p className="mt-4 text-center text-sm text-gray-600 break-all">
             Selected File:
             {" "}
             {selectedFile.name}
@@ -231,54 +260,581 @@ export default function ResumeUpload() {
           onChange={(e) =>
             setJobDescription(e.target.value)
           }
-          className="w-full border border-gray-300 rounded-2xl p-5 min-h-55 outline-none focus:ring-2 focus:ring-black"
+          className="
+            w-full
+            border
+            border-white/30
+            bg-white/40
+            backdrop-blur-xl
+            shadow-xl
+            rounded-3xl
+            p-4 md:p-6
+            min-h-52 md:min-h-56
+            outline-none
+            focus:ring-2
+            focus:ring-black
+            text-sm md:text-base
+          "
         />
 
       </div>
 
+      {/* Template Selector */}
+      <div className="mt-8">
+
+        <label className="block text-left mb-3 font-semibold text-base md:text-lg">
+          Choose Resume Template
+        </label>
+
+        <select
+          value={selectedTemplate}
+          onChange={(e) =>
+            setSelectedTemplate(e.target.value)
+          }
+          className="
+            w-full
+            p-4
+            rounded-2xl
+            border
+            border-white/30
+            bg-white/40
+            backdrop-blur-xl
+            shadow-xl
+            outline-none
+            text-sm md:text-base
+          "
+        >
+
+          <option value="modern">
+            Modern Template
+          </option>
+
+          <option value="minimal">
+            Minimal Template
+          </option>
+
+          <option value="corporate">
+            Corporate Template
+          </option>
+
+        </select>
+
+      </div>
+
       {/* Analyze Button */}
-      <div className="mt-6">
+      <div className="mt-8">
 
         <button
           onClick={analyzeResume}
-          className="bg-black text-white px-8 py-4 rounded-2xl hover:bg-gray-800 transition"
+          className="
+            w-full
+            md:w-auto
+            bg-black
+            text-white
+            px-8
+            py-4
+            rounded-2xl
+            hover:scale-105
+            transition
+            shadow-lg
+          "
         >
           Analyze Resume
         </button>
 
       </div>
 
-      {/* Loading */}
+      {/* Premium Loading */}
       {
         loading && (
 
-          <p className="mt-6 text-center text-lg font-medium">
-            Optimizing Resume with AI...
-          </p>
+          <div className="mt-10">
+
+            <div
+              className="
+                bg-white/40
+                backdrop-blur-xl
+                border
+                border-white/30
+                shadow-2xl
+                rounded-3xl
+                p-6 md:p-10
+                flex
+                flex-col
+                items-center
+                justify-center
+              "
+            >
+
+              <div className="relative w-20 h-20 md:w-24 md:h-24">
+
+                <div
+                  className="
+                    absolute
+                    inset-0
+                    rounded-full
+                    border-4
+                    border-black/10
+                  "
+                />
+
+                <div
+                  className="
+                    absolute
+                    inset-0
+                    rounded-full
+                    border-4
+                    border-transparent
+                    border-t-black
+                    animate-spin
+                  "
+                />
+
+                <div
+                  className="
+                    absolute
+                    inset-4
+                    rounded-full
+                    bg-black
+                    animate-pulse
+                  "
+                />
+
+              </div>
+
+              <h3 className="mt-8 text-xl md:text-2xl font-bold text-center">
+                AI is Optimizing Your Resume
+              </h3>
+
+              <p className="
+                text-gray-600
+                mt-3
+                text-center
+                max-w-xl
+                leading-7
+                text-sm
+                md:text-base
+              ">
+
+                Matching your resume with the job description,
+                improving ATS score, enhancing bullet points,
+                and generating a professional layout.
+
+              </p>
+
+            </div>
+
+          </div>
 
         )
       }
+
+      {/* Before vs After */}
+{
+  optimizedResume &&
+  originalResumeText && (
+
+    <div className="mt-14">
+
+      <h2 className="
+        text-3xl
+        font-bold
+        text-center
+        mb-8
+      ">
+        Before vs After
+      </h2>
+
+      <div className="
+        grid
+        grid-cols-1
+        lg:grid-cols-2
+        gap-8
+      ">
+
+        {/* Original Resume */}
+        <div
+          className="
+            bg-white/40
+            backdrop-blur-xl
+            border
+            border-white/30
+            shadow-xl
+            rounded-3xl
+            p-6
+            overflow-auto
+            max-h-[700px]
+          "
+        >
+
+          <h3 className="
+            text-2xl
+            font-bold
+            mb-5
+          ">
+            Original Resume
+          </h3>
+
+          <pre className="
+            whitespace-pre-wrap
+            text-sm
+            leading-7
+            text-gray-700
+            font-sans
+          ">
+            {originalResumeText}
+          </pre>
+
+        </div>
+
+        {/* AI Improvements */}
+        <div
+          className="
+            bg-white/40
+            backdrop-blur-xl
+            border
+            border-white/30
+            shadow-xl
+            rounded-3xl
+            p-6
+          "
+        >
+
+          <h3 className="
+            text-2xl
+            font-bold
+            mb-5
+          ">
+            AI Improvements
+          </h3>
+
+          <div className="space-y-8">
+
+            {/* ATS Score */}
+            <div>
+
+              <h4 className="font-semibold text-lg">
+                ATS Score
+              </h4>
+
+              <div className="mt-4">
+
+                <div className="
+                  flex
+                  items-center
+                  justify-between
+                  mb-4
+                ">
+
+                  <p className="text-5xl font-bold">
+
+                    {optimizedResume.atsScore}
+
+                    <span className="
+                      text-2xl
+                      text-gray-500
+                    ">
+                      /100
+                    </span>
+
+                  </p>
+
+                  <div
+                    className={`
+                      px-4
+                      py-2
+                      rounded-full
+                      text-sm
+                      font-semibold
+
+                      ${
+                        optimizedResume.atsScore >= 80
+                          ? "bg-green-100 text-green-700"
+
+                          : optimizedResume.atsScore >= 60
+                          ? "bg-yellow-100 text-yellow-700"
+
+                          : "bg-red-100 text-red-700"
+                      }
+                    `}
+                  >
+
+                    {
+                      optimizedResume.atsScore >= 80
+                        ? "Excellent"
+
+                        : optimizedResume.atsScore >= 60
+                        ? "Good"
+
+                        : "Needs Improvement"
+                    }
+
+                  </div>
+
+                </div>
+
+                <div className="
+                  w-full
+                  h-4
+                  bg-gray-200
+                  rounded-full
+                  overflow-hidden
+                ">
+
+                  <div
+                    className={`
+                      h-full
+                      transition-all
+                      duration-1000
+
+                      ${
+                        optimizedResume.atsScore >= 80
+                          ? "bg-green-500"
+
+                          : optimizedResume.atsScore >= 60
+                          ? "bg-yellow-500"
+
+                          : "bg-red-500"
+                      }
+                    `}
+                    style={{
+                      width: `${optimizedResume.atsScore}%`
+                    }}
+                  />
+
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* Strengths */}
+            <div>
+
+              <h4 className="font-semibold text-lg">
+                Strengths
+              </h4>
+
+              <ul className="
+                list-disc
+                ml-6
+                mt-3
+                space-y-2
+              ">
+
+                {
+                  optimizedResume.strengths?.map(
+                    (
+                      item: string,
+                      index: number
+                    ) => (
+
+                      <li key={index}>
+                        {item}
+                      </li>
+
+                    )
+                  )
+                }
+
+              </ul>
+
+            </div>
+
+            {/* Missing Keywords */}
+            <div>
+
+              <h4 className="font-semibold text-lg">
+                Missing Keywords
+              </h4>
+
+              <div className="
+                flex
+                flex-wrap
+                gap-2
+                mt-3
+              ">
+
+                {
+                  optimizedResume.missingKeywords?.map(
+                    (
+                      keyword: string,
+                      index: number
+                    ) => (
+
+                      <span
+                        key={index}
+                        className="
+                          bg-red-100
+                          text-red-700
+                          px-3
+                          py-2
+                          rounded-full
+                          text-sm
+                        "
+                      >
+                        {keyword}
+                      </span>
+
+                    )
+                  )
+                }
+
+              </div>
+
+            </div>
+
+            {/* Recruiter Feedback */}
+            <div>
+
+              <h4 className="font-semibold text-lg">
+                Recruiter Feedback
+              </h4>
+
+              <ul className="
+                list-disc
+                ml-6
+                mt-3
+                space-y-2
+              ">
+
+                {
+                  optimizedResume.recruiterFeedback?.map(
+                    (
+                      item: string,
+                      index: number
+                    ) => (
+
+                      <li key={index}>
+                        {item}
+                      </li>
+
+                    )
+                  )
+                }
+
+              </ul>
+
+            </div>
+
+            {/* Resume Impact */}
+            <div>
+
+              <h4 className="font-semibold text-lg">
+                Resume Impact
+              </h4>
+
+              <p className="
+                mt-3
+                text-gray-700
+                leading-7
+              ">
+
+                {optimizedResume.resumeImpact}
+
+              </p>
+
+            </div>
+
+            {/* Improvement Suggestions */}
+            <div>
+
+              <h4 className="font-semibold text-lg">
+                Improvement Suggestions
+              </h4>
+
+              <ul className="
+                list-disc
+                ml-6
+                mt-3
+                space-y-2
+              ">
+
+                {
+                  optimizedResume.improvementSuggestions?.map(
+                    (
+                      item: string,
+                      index: number
+                    ) => (
+
+                      <li key={index}>
+                        {item}
+                      </li>
+
+                    )
+                  )
+                }
+
+              </ul>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  )
+}
 
       {/* Resume Result */}
       {
         optimizedResume && (
 
-          <div className="mt-10">
+          <div className="mt-10 overflow-x-auto">
 
-            <div className="flex justify-end mb-4">
+            <div className="flex justify-center md:justify-end mb-4">
 
               <button
                 onClick={downloadPDF}
-                className="bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition"
+                className="
+                  w-full
+                  md:w-auto
+                  bg-black
+                  text-white
+                  px-6
+                  py-3
+                  rounded-xl
+                  hover:scale-105
+                  transition
+                  shadow-lg
+                "
               >
                 Download PDF
               </button>
 
             </div>
 
-            <ResumeTemplate
-              data={optimizedResume}
-            />
+            <div className="overflow-x-auto">
+
+              {
+                selectedTemplate === "modern" && (
+                  <ModernTemplate
+                    data={optimizedResume}
+                  />
+                )
+              }
+
+              {
+                selectedTemplate === "minimal" && (
+                  <MinimalTemplate
+                    data={optimizedResume}
+                  />
+                )
+              }
+
+              {
+                selectedTemplate === "corporate" && (
+                  <CorporateTemplate
+                    data={optimizedResume}
+                  />
+                )
+              }
+
+            </div>
 
           </div>
 

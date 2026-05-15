@@ -10,11 +10,20 @@ export default function ResumeTemplate({
 
   <div
   id="resume-template"
-  className="bg-white text-black mx-auto shadow-xl p-12"
+  className="
+bg-white
+text-black
+mx-auto
+shadow-xl
+p-4
+md:p-12
+overflow-hidden
+"
   style={{
-    width: "210mm",
-    minHeight: "297mm"
-  }}
+  width: "210mm",
+  minHeight: "297mm",
+  maxWidth: "100%"
+}}
 >
 
       {/* Header */}
