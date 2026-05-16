@@ -1,27 +1,84 @@
 import ResumeUpload from "@/components/ResumeUpload"
 
+import {
+  SignInButton,
+  UserButton
+} from "@clerk/nextjs"
+
 export default function Home() {
 
   return (
 
     <main className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-gray-200 text-black overflow-hidden">
 
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center py-20 md:py-24 px-4 md:px-6">
+      {/* Top Navbar */}
+      <div className="w-full flex justify-end p-6 gap-4">
 
+        <div className="
+          bg-black
+          text-white
+          px-6
+          py-3
+          rounded-2xl
+          hover:scale-105
+          transition
+          shadow-lg
+          cursor-pointer
+        ">
+
+          <SignInButton />
+
+        </div>
+
+        <div
+          className="
+            bg-white/40
+            backdrop-blur-xl
+            border
+            border-white/30
+            shadow-lg
+            rounded-full
+            px-4
+            py-2
+          "
+        >
+
+          <UserButton />
+
+        </div>
+
+      </div>
+
+      {/* Hero Section */}
+      <section className="flex flex-col items-center justify-center text-center py-10 md:py-16 px-4 md:px-6">
+
+        {/* Hero Content */}
         <div className="max-w-5xl">
+
+          <div className="
+            inline-block
+            px-5
+            py-2
+            rounded-full
+            bg-black
+            text-white
+            text-sm
+            font-semibold
+            mb-6
+            shadow-lg
+          ">
+            AI Powered Resume Builder
+          </div>
 
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight">
 
-            Build
-            {" "}
+            Build{" "}
 
             <span className="text-black">
               ATS-Friendly
             </span>
 
-            {" "}
-            Resumes with AI
+            {" "}Resumes with AI
 
           </h1>
 

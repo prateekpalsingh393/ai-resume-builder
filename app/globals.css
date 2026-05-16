@@ -27,3 +27,18 @@ body {
 * {
   color-scheme: light;
 }
+.clerk-signin-button button {
+  background: black;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.clerk-signin-button button:hover {
+  transform: scale(1.05);
+}

@@ -9,6 +9,8 @@ import ModernTemplate from "@/components/templates/ModernTemplate"
 import MinimalTemplate from "@/components/templates/MinimalTemplate"
 import CorporateTemplate from "@/components/templates/CorporateTemplate"
 
+import { supabase } from "@/lib/supabase"
+
 export default function ResumeUpload() {
 
   const [jobDescription, setJobDescription] =
@@ -158,10 +160,21 @@ export default function ResumeUpload() {
 
       if (data.optimizedResume) {
 
-        setOptimizedResume(
-          data.optimizedResume
-        )
+  setOptimizedResume(
+    data.optimizedResume
+  )
+
+  // SAVE TO SUPABASE
+  await supabase
+    .from("resumes")
+    .insert([
+      {
+        user_email: "demo@test.com",
+        resume_data: data.optimizedResume,
+        ats_score: data.optimizedResume.atsScore
       }
+    ])
+}
 
     } catch (error) {
 
