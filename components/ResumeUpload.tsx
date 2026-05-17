@@ -166,14 +166,30 @@ export default function ResumeUpload() {
 
   // SAVE TO SUPABASE
   await supabase
-    .from("resumes")
-    .insert([
-      {
-        user_email: "demo@test.com",
-        resume_data: data.optimizedResume,
-        ats_score: data.optimizedResume.atsScore
-      }
-    ])
+  .from("resumes")
+  .insert([
+    {
+      user_email: "guest@test.com",
+
+      original_resume:
+        data.originalText,
+
+      optimized_resume:
+        data.optimizedResume,
+
+      ats_score:
+        data.optimizedResume.atsScore,
+
+      template:
+        selectedTemplate,
+
+      job_description:
+        jobDescription,
+
+      file_name:
+        selectedFile?.name
+    }
+  ])
 }
 
     } catch (error) {
