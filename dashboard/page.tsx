@@ -1,14 +1,38 @@
+"use client"
+
+import { useEffect, useState } from "react"
+
 import { supabase } from "@/lib/supabase"
 
-export default async function DashboardPage() {
+export default function DashboardPage() {
 
-  const { data: resumes } =
-    await supabase
-      .from("resumes")
-      .select("*")
-      .order("created_at", {
-        ascending: false
-      })
+  const [resumes, setResumes] =
+    useState<any[]>([])
+
+  useEffect(() => {
+
+    fetchResumes()
+
+  }, [])
+
+  const fetchResumes = async () => {
+
+    const { data, error } =
+      await supabase
+        .from("resumes")
+        .select("*")
+        .order("created_at", {
+          ascending: false
+        })
+
+    if (error) {
+
+      console.log(error)
+      return
+    }
+
+    setResumes(data || [])
+  }
 
   return (
 
@@ -31,6 +55,39 @@ export default async function DashboardPage() {
           Resume Dashboard
         </h1>
 
+        {
+          resumes.length === 0 && (
+
+            <div className="
+              bg-white/40
+              backdrop-blur-xl
+              border
+              border-white/30
+              shadow-xl
+              rounded-3xl
+              p-10
+              text-center
+            ">
+
+              <h2 className="
+                text-2xl
+                font-bold
+              ">
+                No Resumes Found
+              </h2>
+
+              <p className="
+                text-gray-600
+                mt-3
+              ">
+                Analyze a resume first.
+              </p>
+
+            </div>
+
+          )
+        }
+
         <div className="
           grid
           grid-cols-1
@@ -40,7 +97,7 @@ export default async function DashboardPage() {
         ">
 
           {
-            resumes?.map((resume) => (
+            resumes.map((resume) => (
 
               <div
                 key={resume.id}
