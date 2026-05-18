@@ -11,6 +11,11 @@ import CorporateTemplate from "@/components/templates/CorporateTemplate"
 
 import { supabase } from "@/lib/supabase"
 
+import {
+  useUser,
+  SignInButton
+} from "@clerk/nextjs"
+
 export default function ResumeUpload() {
 
   const [jobDescription, setJobDescription] =
@@ -20,7 +25,9 @@ export default function ResumeUpload() {
     useState("modern")
 
   const [loading, setLoading] =
-    useState(false)
+  useState(false)
+
+const { user } = useUser()
 
   const [selectedFile, setSelectedFile] =
     useState<File | null>(null)
@@ -169,7 +176,8 @@ export default function ResumeUpload() {
   .from("resumes")
   .insert([
     {
-      user_email: "guest@test.com",
+      user_email:
+  user?.primaryEmailAddress?.emailAddress,
 
       original_resume:
         data.originalText,
@@ -810,62 +818,102 @@ export default function ResumeUpload() {
 }
 
       {/* Resume Result */}
-      {
-        optimizedResume && (
+{
+  optimizedResume && (
 
-          <div className="mt-10 overflow-x-auto">
+    <div className="mt-10 overflow-x-auto">
 
-            <div className="flex justify-center md:justify-end mb-4">
+      <div className="flex justify-center md:justify-end mb-4">
 
-              <button
-                onClick={downloadPDF}
-                className="
-                  w-full
-                  md:w-auto
-                  bg-black
-                  text-white
-                  px-6
-                  py-3
-                  rounded-xl
-                  hover:scale-105
-                  transition
-                  shadow-lg
-                "
-              >
-                Download PDF
-              </button>
+        {
+  user ? (
 
-            </div>
+    <button
+      onClick={downloadPDF}
+      className="
+        w-full
+        md:w-auto
+        bg-gradient-to-r
+        from-black
+        to-gray-800
+        text-white
+        px-8
+        py-4
+        rounded-2xl
+        hover:scale-105
+        transition
+        shadow-2xl
+        text-lg
+        font-semibold
+      "
+    >
+      ⬇ Download ATS Resume
+    </button>
 
-            <div className="overflow-x-auto">
+  ) : (
 
-              {
-                selectedTemplate === "modern" && (
-                  <ModernTemplate
-                    data={optimizedResume}
-                  />
-                )
-              }
+    <SignInButton
+      mode="modal"
+      forceRedirectUrl="/"
+    >
 
-              {
-                selectedTemplate === "minimal" && (
-                  <MinimalTemplate
-                    data={optimizedResume}
-                  />
-                )
-              }
+      <span
+        className="
+          inline-block
+          w-full
+          md:w-auto
+          bg-black
+          text-white
+          px-8
+          py-4
+          rounded-2xl
+          hover:scale-105
+          transition
+          shadow-2xl
+          text-lg
+          font-semibold
+          cursor-pointer
+        "
+      >
+        🔒 Login to Download PDF
+      </span>
 
-              {
-                selectedTemplate === "corporate" && (
-                  <CorporateTemplate
-                    data={optimizedResume}
-                  />
-                )
-              }
+    </SignInButton>
 
-            </div>
+  )
+}
 
-          </div>
+      </div>
+
+      <div className="overflow-x-auto">
+
+        {
+          selectedTemplate === "modern" && (
+            <ModernTemplate
+              data={optimizedResume}
+            />
+          )
+        }
+
+        {
+          selectedTemplate === "minimal" && (
+            <MinimalTemplate
+              data={optimizedResume}
+            />
+          )
+        }
+
+        {
+          selectedTemplate === "corporate" && (
+            <CorporateTemplate
+              data={optimizedResume}
+            />
+          )
+        }
+
+      </div>
+
+    </div>
 
         )
       }
