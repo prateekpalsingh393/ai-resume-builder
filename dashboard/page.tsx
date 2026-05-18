@@ -2,12 +2,16 @@
 
 import { useEffect, useState } from "react"
 
+import { useUser } from "@clerk/nextjs"
+
 import { supabase } from "@/lib/supabase"
 
 export default function DashboardPage() {
 
   const [resumes, setResumes] =
     useState<any[]>([])
+
+    const { user } = useUser()
 
   useEffect(() => {
 
@@ -20,7 +24,11 @@ export default function DashboardPage() {
     const { data, error } =
       await supabase
         .from("resumes")
-        .select("*")
+.select("*")
+.eq(
+  "user_email",
+  user?.primaryEmailAddress?.emailAddress
+)
         .order("created_at", {
           ascending: false
         })
