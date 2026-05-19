@@ -38,6 +38,13 @@ const { user } = useUser()
   const [originalResumeText, setOriginalResumeText] =
     useState("")
 
+    const [coverLetter, setCoverLetter] =
+  useState("")
+
+const [coverLetterLoading,
+  setCoverLetterLoading] =
+  useState(false)
+
   // PDF Download
   const downloadPDF = async () => {
 
@@ -210,7 +217,55 @@ const { user } = useUser()
 
       setLoading(false)
     }
+    }
+  async function generateCoverLetter() {
+
+  if (!optimizedResume) return
+
+  setCoverLetterLoading(true)
+
+  try {
+
+    const response = await fetch(
+      "/api/cover-letter",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+          optimizedResume,
+          jobDescription
+        })
+      }
+    )
+
+    const data =
+      await response.json()
+
+    if (data.coverLetter) {
+
+      setCoverLetter(
+        data.coverLetter
+      )
+    }
+
+  } catch (error) {
+
+    console.log(error)
+
+    alert(
+      "Failed to generate cover letter"
+    )
+
+  } finally {
+
+    setCoverLetterLoading(false)
   }
+}
 
   const {
     getRootProps,
@@ -822,6 +877,37 @@ const { user } = useUser()
   optimizedResume && (
 
     <div className="mt-10 overflow-x-auto">
+      <div className="mb-6">
+
+  <button
+    onClick={generateCoverLetter}
+    className="
+      w-full
+      md:w-auto
+      bg-gradient-to-r
+      from-indigo-600
+      to-purple-600
+      text-white
+      px-8
+      py-4
+      rounded-2xl
+      hover:scale-105
+      transition
+      shadow-2xl
+      text-lg
+      font-semibold
+    "
+  >
+
+    {
+      coverLetterLoading
+        ? "Generating..."
+        : "✨ Generate AI Cover Letter"
+    }
+
+  </button>
+
+</div>
 
       <div className="flex justify-center md:justify-end mb-4">
 
@@ -918,6 +1004,112 @@ const { user } = useUser()
         )
       }
 
+      {
+  coverLetter && (
+
+    <div className="mt-14">
+
+      <div
+        className="
+          bg-white/40
+          backdrop-blur-xl
+          border
+          border-white/30
+          shadow-2xl
+          rounded-3xl
+          p-8
+        "
+      >
+
+        <div
+          className="
+            flex
+            items-center
+            justify-between
+            mb-6
+          "
+        >
+
+          <h2
+            className="
+              text-3xl
+              font-bold
+            "
+          >
+            AI Cover Letter
+          </h2>
+
+          <button
+            onClick={() =>
+              navigator.clipboard.writeText(
+                coverLetter
+              )
+            }
+            className="
+              bg-black
+              text-white
+              px-5
+              py-2
+              rounded-xl
+            "
+          >
+            Copy
+          </button>
+
+        </div>
+
+        <div
+          className="
+            whitespace-pre-wrap
+            leading-8
+            text-left
+            text-gray-800
+            bg-white
+            rounded-2xl
+            p-10
+            border
+            border-gray-200
+            shadow-inner
+            font-serif
+            text-[17px]
+            max-w-4xl
+            mx-auto
+          "
+        >
+
+          {
+            coverLetter
+              ?.replace(/\*\*/g, "")
+              ?.split("\n")
+              ?.map((line, index) => (
+
+                <p
+                  key={index}
+                  className="
+                    mb-4
+                    text-left
+                  "
+                >
+
+                  {
+                    line.startsWith("*")
+                      ? `• ${line.replace("*", "")}`
+                      : line
+                  }
+
+                </p>
+
+              ))
+          }
+
+        </div>
+
+      </div>
+
+    </div>
+
+  )
+}
     </div>
   )
 }
