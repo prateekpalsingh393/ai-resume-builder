@@ -45,6 +45,14 @@ const [coverLetterLoading,
   setCoverLetterLoading] =
   useState(false)
 
+  const [interviewPrep,
+  setInterviewPrep] =
+  useState("")
+
+const [interviewLoading,
+  setInterviewLoading] =
+  useState(false)
+
   // PDF Download
   const downloadPDF = async () => {
 
@@ -271,6 +279,57 @@ setOptimizedResume({
   } finally {
 
     setCoverLetterLoading(false)
+  }
+}
+
+async function
+generateInterviewPrep() {
+
+  if (!optimizedResume) return
+
+  setInterviewLoading(true)
+
+  try {
+
+    const response =
+      await fetch(
+        "/api/interview-prep",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            optimizedResume,
+            jobDescription
+          })
+        }
+      )
+
+    const data =
+      await response.json()
+
+    if (data.interviewPrep) {
+
+      setInterviewPrep(
+        data.interviewPrep
+      )
+    }
+
+  } catch (error) {
+
+    console.log(error)
+
+    alert(
+      "Failed to generate interview prep"
+    )
+
+  } finally {
+
+    setInterviewLoading(false)
   }
 }
 
@@ -884,13 +943,20 @@ setOptimizedResume({
   optimizedResume && (
 
     <div className="mt-10 overflow-x-auto">
-      <div className="mb-6">
+      <div
+  className="
+    flex
+    flex-wrap
+    justify-center
+    items-center
+    gap-5
+    mt-10
+  "
+>
 
   <button
     onClick={generateCoverLetter}
     className="
-      w-full
-      md:w-auto
       bg-gradient-to-r
       from-indigo-600
       to-purple-600
@@ -903,6 +969,7 @@ setOptimizedResume({
       shadow-2xl
       text-lg
       font-semibold
+      min-w-[260px]
     "
   >
 
@@ -914,69 +981,57 @@ setOptimizedResume({
 
   </button>
 
+  <button
+    onClick={generateInterviewPrep}
+    className="
+      bg-gradient-to-r
+      from-emerald-600
+      to-teal-600
+      text-white
+      px-8
+      py-4
+      rounded-2xl
+      hover:scale-105
+      transition
+      shadow-2xl
+      text-lg
+      font-semibold
+      min-w-[260px]
+    "
+  >
+
+    {
+      interviewLoading
+        ? "Generating..."
+        : "🎯 Generate Interview Prep"
+    }
+
+  </button>
+
+  <button
+    onClick={downloadPDF}
+    className="
+      bg-gradient-to-r
+      from-black
+      to-slate-800
+      text-white
+      px-8
+      py-4
+      rounded-2xl
+      hover:scale-105
+      transition
+      shadow-2xl
+      text-lg
+      font-semibold
+      min-w-[260px]
+    "
+  >
+    ⬇ Download ATS Resume
+  </button>
+
 </div>
 
-      <div className="flex justify-center md:justify-end mb-4">
-
-        {
-  user ? (
-
-    <button
-      onClick={downloadPDF}
-      className="
-        w-full
-        md:w-auto
-        bg-gradient-to-r
-        from-black
-        to-gray-800
-        text-white
-        px-8
-        py-4
-        rounded-2xl
-        hover:scale-105
-        transition
-        shadow-2xl
-        text-lg
-        font-semibold
-      "
-    >
-      ⬇ Download ATS Resume
-    </button>
-
-  ) : (
-
-    <SignInButton
-      mode="modal"
-      forceRedirectUrl="/"
-    >
-
-      <span
-        className="
-          inline-block
-          w-full
-          md:w-auto
-          bg-black
-          text-white
-          px-8
-          py-4
-          rounded-2xl
-          hover:scale-105
-          transition
-          shadow-2xl
-          text-lg
-          font-semibold
-          cursor-pointer
-        "
-      >
-        🔒 Login to Download PDF
-      </span>
-
-    </SignInButton>
-
-  )
-}
-
-      </div>
+      
 
       <div className="overflow-x-auto">
 
@@ -1144,6 +1199,90 @@ setOptimizedResume({
 
   )
 }
+
+{
+  interviewPrep && (
+
+    <div className="mt-14">
+
+      <div
+        className="
+          bg-white/40
+          backdrop-blur-xl
+          border
+          border-white/30
+          shadow-2xl
+          rounded-3xl
+          p-8
+        "
+      >
+
+        <div className="
+          flex
+          items-center
+          justify-between
+          mb-6
+        ">
+
+          <h2 className="
+            text-3xl
+            font-bold
+          ">
+            AI Interview Prep
+          </h2>
+
+          <button
+            onClick={() =>
+              navigator.clipboard.writeText(
+                interviewPrep
+              )
+            }
+            className="
+              bg-black
+              text-white
+              px-5
+              py-2
+              rounded-xl
+            "
+          >
+            Copy
+          </button>
+
+        </div>
+
+        <div
+          className="
+            whitespace-pre-wrap
+            leading-8
+            text-left
+            text-gray-800
+            bg-white
+            rounded-2xl
+            p-10
+            border
+            border-gray-200
+            shadow-inner
+            font-serif
+            text-[17px]
+            max-w-5xl
+            mx-auto
+          "
+        >
+
+          {
+            interviewPrep
+              ?.replace(/\*\*/g, "")
+          }
+
+        </div>
+
+      </div>
+
     </div>
+
+  )
+}
+    </div>
+    
   )
 }

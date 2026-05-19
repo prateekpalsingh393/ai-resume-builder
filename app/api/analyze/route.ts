@@ -89,6 +89,8 @@ export async function POST(req: NextRequest) {
 
         model: "deepseek/deepseek-chat",
 
+        max_tokens: 4000,
+
         messages: [
           {
             role: "system",
@@ -170,7 +172,7 @@ ${jobDescription}
       })
 
     const aiResponse =
-      completion.choices[0].message.content || "{}"
+  completion?.choices?.[0]?.message?.content || "{}"
 
     console.log(aiResponse)
 

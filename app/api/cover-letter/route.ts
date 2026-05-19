@@ -34,6 +34,8 @@ export async function POST(
 
         model: "deepseek/deepseek-chat",
 
+        max_tokens: 3000,
+
         messages: [
           {
             role: "system",
