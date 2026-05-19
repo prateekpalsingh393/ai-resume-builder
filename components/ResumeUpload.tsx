@@ -174,36 +174,43 @@ const [coverLetterLoading,
 
       if (data.optimizedResume) {
 
-  setOptimizedResume(
-    data.optimizedResume
-  )
+  const shareId =
+  crypto.randomUUID()
+
+setOptimizedResume({
+  ...data.optimizedResume,
+  share_id: shareId
+})
+  
+        setOptimizedResume({
+  ...data.optimizedResume,
+  share_id: shareId
+})
+
 
   // SAVE TO SUPABASE
+
   await supabase
   .from("resumes")
   .insert([
     {
-      user_email:
-  user?.primaryEmailAddress?.emailAddress,
+  user_email:
+    user?.primaryEmailAddress?.emailAddress,
 
-      original_resume:
-        data.originalText,
+  original_resume:
+    data.originalText,
 
-      optimized_resume:
-        data.optimizedResume,
+  optimized_resume:
+    data.optimizedResume,
 
-      ats_score:
-        data.optimizedResume.atsScore,
+  ats_score:
+    data.optimizedResume.atsScore,
 
-      template:
-        selectedTemplate,
+  share_id: shareId,
 
-      job_description:
-        jobDescription,
-
-      file_name:
-        selectedFile?.name
-    }
+  template:
+    selectedTemplate
+}
   ])
 }
 
@@ -1055,6 +1062,33 @@ const [coverLetterLoading,
           >
             Copy
           </button>
+
+          <button
+  onClick={() => {
+
+    const shareUrl =
+      `${window.location.origin}/resume/${
+        optimizedResume?.share_id
+      }`
+
+    navigator.clipboard.writeText(
+      shareUrl
+    )
+
+    alert("Share link copied!")
+  }}
+
+  className="
+    bg-indigo-600
+    text-white
+    px-5
+    py-2
+    rounded-xl
+    ml-3
+  "
+>
+  Share Resume
+</button>
 
         </div>
 
