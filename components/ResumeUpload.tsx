@@ -2,7 +2,7 @@
 
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas-pro"
-import { useCallback, useState } from "react"
+import { useCallback, useState, useEffect } from "react"
 import { useDropzone } from "react-dropzone"
 
 import ModernTemplate from "@/components/templates/ModernTemplate"
@@ -29,8 +29,16 @@ export default function ResumeUpload() {
 
 const { user } = useUser()
 
-  const [selectedFile, setSelectedFile] =
-    useState<File | null>(null)
+useEffect(() => {
+
+  if (!user) return
+
+  createUserProfile()
+
+}, [user])
+
+const [selectedFile, setSelectedFile] =
+  useState<File | null>(null)
 
   const [optimizedResume, setOptimizedResume] =
     useState<Record<string, any> | null>(null)
@@ -52,6 +60,10 @@ const [coverLetterLoading,
 const [interviewLoading,
   setInterviewLoading] =
   useState(false)
+
+  const [credits,
+  setCredits] =
+  useState<number | null>(null)
 
   // PDF Download
   const downloadPDF = async () => {
@@ -117,6 +129,48 @@ const [interviewLoading,
 
     pdf.save("ATS-Resume.pdf")
   }
+
+  async function createUserProfile() {
+
+  if (!user) return
+
+  try {
+
+    const email =
+      user.primaryEmailAddress
+        ?.emailAddress
+
+    const { data } =
+      await supabase
+        .from("users_data")
+        .select("*")
+        .eq("email", email)
+        .single()
+
+    if (!data) {
+
+  await supabase
+    .from("users_data")
+    .insert([
+      {
+        email,
+        credits: 5,
+        is_pro: false
+      }
+    ])
+
+  setCredits(5)
+
+} else {
+
+  setCredits(data.credits)
+}
+
+  } catch (error) {
+
+    console.log(error)
+  }
+}
 
   // STORE FILE
   const onDrop = useCallback(
@@ -190,12 +244,6 @@ setOptimizedResume({
   share_id: shareId
 })
   
-        setOptimizedResume({
-  ...data.optimizedResume,
-  share_id: shareId
-})
-
-
   // SAVE TO SUPABASE
 
   await supabase
@@ -347,6 +395,31 @@ generateInterviewPrep() {
 
   return (
 
+  <>
+  
+  <div className="flex justify-end mb-6">
+
+  <div
+    className="
+      bg-black
+      text-white
+      px-5
+      py-2
+      rounded-2xl
+      shadow-xl
+      text-sm
+      font-semibold
+    "
+  >
+
+    Credits Left:
+    {" "}
+    {credits ?? "..."}
+
+  </div>
+
+</div>
+    
     <div className="w-full">
 
       {/* Upload Box */}
@@ -1283,6 +1356,8 @@ generateInterviewPrep() {
   )
 }
     </div>
-    
-  )
+
+</>
+
+)
 }
