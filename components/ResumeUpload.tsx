@@ -65,6 +65,10 @@ const [interviewLoading,
   setCredits] =
   useState<number | null>(null)
 
+  const [showUpgradeModal,
+  setShowUpgradeModal] =
+  useState(false)
+
   // PDF Download
   const downloadPDF = async () => {
 
@@ -171,6 +175,61 @@ const [interviewLoading,
     console.log(error)
   }
 }
+async function deductCredits(
+  amount: number
+) {
+
+  if (!user) return false
+
+  try {
+
+    const email =
+      user.primaryEmailAddress
+        ?.emailAddress
+
+    const { data } =
+      await supabase
+        .from("users_data")
+        .select("*")
+        .eq("email", email)
+        .single()
+
+    if (!data) return false
+
+    if (
+      !data.is_pro &&
+      data.credits < amount
+    ) {
+
+      setShowUpgradeModal(true)
+
+      return false
+    }
+
+    if (!data.is_pro) {
+
+      const updatedCredits =
+        data.credits - amount
+
+      await supabase
+        .from("users_data")
+        .update({
+          credits: updatedCredits
+        })
+        .eq("email", email)
+
+      setCredits(updatedCredits)
+    }
+
+    return true
+
+  } catch (error) {
+
+    console.log(error)
+
+    return false
+  }
+}
 
   // STORE FILE
   const onDrop = useCallback(
@@ -195,11 +254,16 @@ const [interviewLoading,
     }
 
     if (!jobDescription) {
-      alert("Please paste job description")
-      return
-    }
+  alert("Please paste job description")
+  return
+}
 
-    setLoading(true)
+const canProceed =
+  await deductCredits(1)
+
+if (!canProceed) return
+
+setLoading(true)
 
     const formData = new FormData()
 
@@ -285,7 +349,12 @@ setOptimizedResume({
 
   if (!optimizedResume) return
 
-  setCoverLetterLoading(true)
+const canProceed =
+  await deductCredits(1)
+
+if (!canProceed) return
+
+setCoverLetterLoading(true)
 
   try {
 
@@ -335,7 +404,12 @@ generateInterviewPrep() {
 
   if (!optimizedResume) return
 
-  setInterviewLoading(true)
+const canProceed =
+  await deductCredits(2)
+
+if (!canProceed) return
+
+setInterviewLoading(true)
 
   try {
 
@@ -1356,6 +1430,135 @@ generateInterviewPrep() {
   )
 }
     </div>
+
+    {
+  showUpgradeModal && (
+
+    <div
+      className="
+        fixed
+        inset-0
+        bg-black/60
+        backdrop-blur-sm
+        flex
+        items-center
+        justify-center
+        z-50
+      "
+    >
+
+      <div
+        className="
+          bg-white
+          rounded-3xl
+          p-10
+          max-w-md
+          w-full
+          shadow-2xl
+          text-center
+        "
+      >
+
+        <h2
+          className="
+            text-4xl
+            font-extrabold
+            mb-4
+          "
+        >
+          Upgrade to Pro 🚀
+        </h2>
+
+        <p
+          className="
+            text-gray-600
+            text-lg
+            mb-8
+          "
+        >
+          You’ve used all your credits.
+
+          Upgrade to Pro for:
+        </p>
+
+        <div
+          className="
+            space-y-3
+            text-left
+            mb-8
+            text-gray-700
+          "
+        >
+
+          <p>
+            ✅ Unlimited Resume Analysis
+          </p>
+
+          <p>
+            ✅ Unlimited Cover Letters
+          </p>
+
+          <p>
+            ✅ Unlimited Interview Prep
+          </p>
+
+          <p>
+            ✅ Premium Templates
+          </p>
+
+        </div>
+
+        <div
+          className="
+            flex
+            gap-4
+          "
+        >
+
+          <button
+            onClick={() =>
+              setShowUpgradeModal(false)
+            }
+            className="
+              flex-1
+              border
+              border-gray-300
+              py-3
+              rounded-2xl
+              font-semibold
+            "
+          >
+            Later
+          </button>
+
+          <button
+            onClick={() =>
+              window.location.href =
+                "/pricing"
+            }
+            className="
+              flex-1
+              bg-gradient-to-r
+              from-indigo-600
+              to-purple-600
+              text-white
+              py-3
+              rounded-2xl
+              font-bold
+              shadow-xl
+            "
+          >
+            Upgrade
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  )
+}
 
 </>
 
