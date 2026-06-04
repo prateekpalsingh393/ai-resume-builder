@@ -1,5 +1,6 @@
 "use client"
 
+import { saveHistory } from "@/lib/history"
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas-pro"
 import { useCallback, useState, useEffect } from "react"
@@ -67,6 +68,14 @@ const [interviewLoading,
 
   const [showUpgradeModal,
   setShowUpgradeModal] =
+  useState(false)
+
+  const [jobMatch,
+  setJobMatch] =
+  useState<any>(null)
+
+const [jobMatchLoading,
+  setJobMatchLoading] =
   useState(false)
 
   // PDF Download
@@ -307,6 +316,17 @@ setOptimizedResume({
   ...data.optimizedResume,
   share_id: shareId
 })
+
+
+
+setJobMatch(null)
+setCoverLetter("")
+setInterviewPrep("")
+
+console.log(
+  "OPTIMIZED RESUME SET:",
+  data.optimizedResume
+)
   
   // SAVE TO SUPABASE
 
@@ -380,10 +400,24 @@ setCoverLetterLoading(true)
 
     if (data.coverLetter) {
 
-      setCoverLetter(
-        data.coverLetter
-      )
-    }
+  setJobMatch(null)
+  setInterviewPrep("")
+
+  setCoverLetter(
+    data.coverLetter
+  )
+
+  await saveHistory(
+    user?.primaryEmailAddress
+      ?.emailAddress || "",
+
+    "cover-letter",
+
+    "AI Cover Letter",
+
+    data.coverLetter
+  )
+}
 
   } catch (error) {
 
@@ -436,10 +470,26 @@ setInterviewLoading(true)
 
     if (data.interviewPrep) {
 
-      setInterviewPrep(
-        data.interviewPrep
-      )
-    }
+  setJobMatch(null)
+  setCoverLetter("")
+
+  setInterviewPrep(
+    data.interviewPrep
+  )
+
+  await saveHistory(
+
+    user?.primaryEmailAddress
+      ?.emailAddress || "",
+
+    "interview-prep",
+
+    "Interview Preparation",
+
+    data.interviewPrep
+
+  )
+}
 
   } catch (error) {
 
@@ -452,6 +502,69 @@ setInterviewLoading(true)
   } finally {
 
     setInterviewLoading(false)
+  }
+}
+
+async function analyzeJobMatch() {
+
+  if (!optimizedResume) return
+
+  setJobMatchLoading(true)
+
+  try {
+
+    const response =
+      await fetch(
+        "/api/job-match",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            optimizedResume,
+            jobDescription
+          })
+        }
+      )
+
+    const data =
+  await response.json()
+
+setCoverLetter("")
+setInterviewPrep("")
+
+setJobMatch(data)
+
+await saveHistory(
+
+  user?.primaryEmailAddress
+    ?.emailAddress || "",
+
+  "job-match",
+
+  "Job Match Analysis",
+
+  data
+
+)
+
+await deductCredits(1)
+
+  } catch (error) {
+
+    console.log(error)
+
+    alert(
+      "Failed to analyze job match"
+    )
+
+  } finally {
+
+    setJobMatchLoading(false)
   }
 }
 
@@ -1176,6 +1289,31 @@ setInterviewLoading(true)
     ⬇ Download ATS Resume
   </button>
 
+  <button
+  
+  onClick={analyzeJobMatch}
+  disabled={jobMatchLoading}
+  className="
+    bg-gradient-to-r
+    from-orange-500
+    to-orange-600
+    text-white
+    px-8
+    py-4
+    rounded-2xl
+    font-bold
+    shadow-xl
+    hover:scale-105
+    transition-all
+  "
+>
+  {
+    jobMatchLoading
+      ? "Analyzing..."
+      : "🎯 Analyze Job Match"
+  }
+</button>
+
 </div>
 
       
@@ -1264,6 +1402,152 @@ setInterviewLoading(true)
           >
             Copy
           </button>
+
+          {
+  
+  jobMatch && (
+
+    <div
+      className="
+        bg-white
+        rounded-3xl
+        shadow-2xl
+        p-10
+        mb-10
+        border
+      "
+    >
+
+      <h2
+        className="
+          text-4xl
+          font-bold
+          mb-8
+          text-center
+        "
+      >
+        🎯 Job Match Analysis
+      </h2>
+
+      <div className="text-center mb-10">
+
+        <div
+          className="
+            text-7xl
+            font-extrabold
+            text-orange-500
+          "
+        >
+          {jobMatch.matchScore}%
+        </div>
+
+        <p className="text-gray-500">
+          Resume Match Score
+        </p>
+
+      </div>
+
+      <div
+        className="
+          grid
+          md:grid-cols-2
+          gap-8
+        "
+      >
+
+        <div>
+
+          <h3
+            className="
+              text-2xl
+              font-bold
+              mb-4
+            "
+          >
+            Missing Keywords
+          </h3>
+
+          <div
+            className="
+              flex
+              flex-wrap
+              gap-2
+            "
+          >
+
+            {
+              jobMatch.missingKeywords?.map(
+                (item: string) => (
+
+                  <span
+                    key={item}
+                    className="
+                      bg-red-100
+                      text-red-700
+                      px-3
+                      py-1
+                      rounded-full
+                      text-sm
+                    "
+                  >
+                    {item}
+                  </span>
+
+                )
+              )
+            }
+
+          </div>
+
+        </div>
+
+        <div>
+
+          <h3
+            className="
+              text-2xl
+              font-bold
+              mb-4
+            "
+          >
+            Recommendations
+          </h3>
+
+          <ul
+            className="
+              space-y-3
+            "
+          >
+
+            {
+              jobMatch.recommendations?.map(
+                (item: string) => (
+
+                  <li
+                    key={item}
+                    className="
+                      bg-green-50
+                      p-3
+                      rounded-xl
+                    "
+                  >
+                    ✅ {item}
+                  </li>
+
+                )
+              )
+            }
+
+          </ul>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  )
+}
 
           <button
   onClick={() => {

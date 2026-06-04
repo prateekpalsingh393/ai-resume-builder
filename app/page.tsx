@@ -10,7 +10,30 @@ export default function Home() {
   return (
 
     <main className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-gray-200 text-black overflow-hidden">
-
+<div
+  className="
+    fixed
+    top-6
+    left-6
+    z-50
+  "
+>
+  <a
+    href="/dashboard"
+    className="
+      bg-black
+      text-white
+      px-5
+      py-3
+      rounded-xl
+      shadow-xl
+      hover:scale-105
+      transition-all
+    "
+  >
+    📊 Dashboard
+  </a>
+</div>
       {/* Top Navbar */}
       <div className="w-full flex justify-end p-6 gap-4">
 
@@ -56,19 +79,20 @@ export default function Home() {
         <div className="max-w-5xl">
 
           <div className="
-            inline-block
-            px-5
-            py-2
-            rounded-full
-            bg-black
-            text-white
-            text-sm
-            font-semibold
-            mb-6
-            shadow-lg
-          ">
-            AI Powered Resume Builder
-          </div>
+  inline-block
+  px-5
+  py-2
+  rounded-full
+  bg-black
+  text-white
+  text-sm
+  font-semibold
+  mb-6
+  shadow-lg
+">
+  AI Powered Resume Builder
+</div>
+            
 
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight">
 
@@ -89,12 +113,43 @@ export default function Home() {
             ATS-optimized resume powered by AI.
 
           </p>
+          <div
+  className="
+    mt-8
+    flex
+    justify-center
+    gap-4
+    flex-wrap
+  "
+>
+
+  <a
+    href="#upload"
+    className="
+      bg-black
+      text-white
+      px-8
+      py-4
+      rounded-2xl
+      font-semibold
+      shadow-lg
+      hover:scale-105
+      transition
+    "
+  >
+    🚀 Build Resume Now
+  </a>
+
+</div>
 
         </div>
 
         {/* Upload Section */}
-        <div className="mt-12 md:mt-14 w-full max-w-4xl">
-          <ResumeUpload />
+<div
+  id="upload"
+  className="mt-12 md:mt-14 w-full max-w-6xl"
+>
+  <ResumeUpload />
         </div>
 
       </section>
